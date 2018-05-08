@@ -28,7 +28,7 @@ Then run `wrk` with the `-L` option and store the output into a file, like:
 
 Finally plot the percentile distribution:
 
-    ./hdr-plot.py --output myplot.png --title "My plot" ./result.out [...
+    ./hdr-plot.py --output myplot.png --title "My plot" ./result.out [...]
 
 You can provide more files to be plotted on the same graph:
 
