@@ -14,7 +14,7 @@ For example:
 
 usage:
 
-    usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] files [files ...]
+    usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] [--nobox] files [files ...]
 
 To run need a few packages to be installed:
 
@@ -32,7 +32,7 @@ Finally plot the percentile distribution:
 
 You can provide more files to be plotted on the same graph:
 
-    ./hdr-plot.py --output myplot.png --title "My plot" ./file1.out ./file2.out ./file3.out
+    ./hdr-plot.py --output myplot.png --title "My plot" ./sample/file1.out ./sample/file2.out ./sample/file3.out
 
 
 ## License
