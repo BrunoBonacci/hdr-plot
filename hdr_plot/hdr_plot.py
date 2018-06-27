@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # hdr-plot.py v0.2.0 - A simple HdrHistogram plotting script.
 # Copyright © 2018 Bruno Bonacci - Distributed under the Apache License v 2.0
@@ -114,7 +113,3 @@ def main():
     # save image
     plt.savefig(args.output)
     print( "Wrote: " + args.output)
-
-
-if __name__ == "__main__":
-    main()

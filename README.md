@@ -12,15 +12,13 @@ For example:
 
 ## how to run
 
+installation:
+
+    pip3 install --user --upgrade hdr-plot
+
 usage:
 
-    usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] [--nobox] files [files ...]
-
-To run need a few packages to be installed:
-
-  * install python3
-
-    pip3 install --user pandas matplotlib
+    usage: hdr-plot [-h] [--output OUTPUT] [--title TITLE] [--nobox] files [files ...]
 
 Then run `wrk` with the `-L` option and store the output into a file, like:
 
@@ -28,11 +26,11 @@ Then run `wrk` with the `-L` option and store the output into a file, like:
 
 Finally plot the percentile distribution:
 
-    ./hdr-plot.py --output myplot.png --title "My plot" ./result.out [...]
+    hdr-plot --output myplot.png --title "My plot" ./result.out [...]
 
 You can provide more files to be plotted on the same graph:
 
-    ./hdr-plot.py --output myplot.png --title "My plot" ./sample/file1.out ./sample/file2.out ./sample/file3.out
+    hdr-plot --output myplot.png --title "My plot" ./sample/file1.out ./sample/file2.out ./sample/file3.out
 
 
 ## License
