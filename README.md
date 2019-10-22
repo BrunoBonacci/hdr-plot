@@ -14,7 +14,7 @@ For example:
 
 installation:
 
-    pip3 install --user --upgrade hdr-plot
+    pip3 install --upgrade --user matplotlib pandas hdr-plot
 
 usage:
 
