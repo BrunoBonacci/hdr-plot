@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hdr-plot",
-    version="0.2.0",
+    version="0.2.3",
     author="Bruno Bonacci",
     author_email="bonacci.bruno@gmail.com",
     description="A simple HdrHistogram plotting script.",
@@ -18,6 +18,10 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent"
     ),
+    install_requires=[
+        'matplotlib',
+        'pandas'
+    ],
     scripts=['bin/hdr-plot'],
 
 )

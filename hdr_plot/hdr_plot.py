@@ -1,5 +1,5 @@
 #
-# hdr-plot.py v0.2.0 - A simple HdrHistogram plotting script.
+# hdr-plot.py v0.2.3 - A simple HdrHistogram plotting script.
 # Copyright © 2018 Bruno Bonacci - Distributed under the Apache License v 2.0
 #
 # usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] [--nobox] files [files ...]
