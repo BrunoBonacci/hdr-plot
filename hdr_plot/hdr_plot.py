@@ -42,7 +42,7 @@ def info_text(name, data):
     textstr = '%-18s\n------------------\n%-6s = %6.2f ms\n%-6s = %6.2f ms\n%-6s = %6.2f ms\n'%(
         name,
         "min",    data['Latency'].min(),
-        "median", data[data["Percentile"] == 0.5]["Latency"],
+        "median", data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency'],
         "max",    data['Latency'].max())
     return textstr
 
@@ -113,3 +113,8 @@ def main():
     # save image
     plt.savefig(args.output)
     print( "Wrote: " + args.output)
+
+
+# for testing
+if __name__ == "__main__":
+    main()
