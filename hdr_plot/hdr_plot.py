@@ -24,6 +24,8 @@ import matplotlib.ticker as ticker
 #
 
 regex = re.compile(r'\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)')
+mean_stddev_regex = re.compile(r'#\[Mean(?:\s+)=(?:\s+)([0-9.]+),(?:\s+)StdDeviation(?:\s+)=(?:\s+)([0-9.]+)')
+max_totalcount_regex = re.compile(r'#\[Max(?:\s+)=(?:\s+)([0-9.]+),(?:\s+)Total count(?:\s+)=(?:\s+)([0-9.]+)')
 filename = re.compile(r'(.*/)?([^.]*)(\.\w+\d+)?')
 
 def parse_percentiles( file ):
@@ -33,52 +35,85 @@ def parse_percentiles( file ):
     percentiles = pd.DataFrame(pctles, columns=['Latency', 'Percentile', 'TotalCount', 'inv-pct'])
     return percentiles
 
+def parse_metadata( file ):
+    mean_stddev_line = [ line for line in open(file) if re.match(mean_stddev_regex, line) ][0]
+    max_totalcount_line = [ line for line in open(file) if re.match(max_totalcount_regex, line) ][0]
+    mean_stddev = re.findall(mean_stddev_regex, mean_stddev_line)
+    max_totalcount = re.findall(max_totalcount_regex, max_totalcount_line)
+    return {
+        'Mean': mean_stddev[0][0],
+        'StdDeviation': mean_stddev[0][1],
+        'Max': max_totalcount[0][0],
+        'Total count': max_totalcount[0][1]
+    }
 
-def parse_files( files ):
-    return [ parse_percentiles(file) for file in files]
+def parse_pct_files( files ):
+    return [ parse_percentiles(file) for file in files ]
 
+def parse_metadata_files( files ):
+    return [ parse_metadata(file) for file in files ]
 
-def info_text(name, data):
-    textstr = '%-18s\n------------------\n%-6s = %6.2f ms\n%-6s = %6.2f ms\n%-6s = %6.2f ms\n'%(
-        name,
-        "min",    data['Latency'].min(),
-        "median", data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency'],
-        "max",    data['Latency'].max())
+def info_text(name, data, metadata, units):
+    delimiter = '---------------------'
+    unit = units['shorthand']
+    min = data['Latency'].min()
+    mean = float(metadata['Mean'])
+    median = float(data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency'])
+    max = data['Latency'].max()
+    textstr = f'{name}\n{delimiter}\n' \
+              f'min    = {min:>9.2f} {unit}\n' \
+              f'mean   = {mean:>9.2f} {unit}\n' \
+              f'median = {median:>9.2f} {unit}\n' \
+              f'max    = {max:>9.2f} {unit}\n'
     return textstr
 
-
-def info_box(ax, text):
+def info_box(ax, text, x):
     props = dict(boxstyle='round', facecolor='lightcyan', alpha=0.5)
 
     # place a text box in upper left in axes coords
-    ax.text(0.05, 0.95, text, transform=ax.transAxes,
-        verticalalignment='top', bbox=props, fontname='monospace')
+    ax.text(x, 0.95, text, transform=ax.transAxes,
+            verticalalignment='top', bbox=props, fontname='monospace')
 
 
-def plot_summarybox( ax, percentiles, labels ):
+def plot_summarybox( ax, percentiles, metadata, labels, units ):
     # add info box to the side
-    textstr = '\n'.join([info_text(labels[i], percentiles[i]) for i in range(len(labels))])
-    info_box(ax, textstr)
+    if len(labels) < 5:
+        textstr = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units) for i in range(len(labels))])
+        info_box(ax, textstr, 0.02)
+    else:
+        textstr1 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units) for i in range(4)])
+        textstr2 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units) for i in range(4, len(labels))])
+        info_box(ax, textstr1, 0.02)
+        info_box(ax, textstr2, 0.18)
 
 
-def plot_percentiles( percentiles, labels ):
+def plot_percentiles(percentiles, labels, units, percentiles_range_max):
     fig, ax = plt.subplots(figsize=(16,8))
+    max_percentile = float("0." + percentiles_range_max.replace('.', ''))
+
     # plot values
     for data in percentiles:
         ax.plot(data['Percentile'], data['Latency'])
 
+    # percentiles
+    all_percentiles = [0.25, 0.5, 0.9, 0.99, 0.999, 0.9999, 0.99999, 0.999999, 0.9999999, 0.99999999, 0.999999999]
+    all_percentile_labels = ["25%", "50%", "90%", "99%", "99.9%", "99.99%", "99.999%", "99.9999%",  "99.99999%",  "99.999999%",  "99.9999999%"]
+    percentiles_max_index = all_percentiles.index(max_percentile)
+
     # set axis and legend
+    unit = units['name']
     ax.grid()
     ax.set(xlabel='Percentile',
-           ylabel='Latency (milliseconds)',
+           ylabel=f'Latency ({unit})',
            title='Latency Percentiles (lower is better)')
     ax.set_xscale('logit')
-    plt.xticks([0.25, 0.5, 0.9, 0.99, 0.999, 0.9999, 0.99999, 0.999999])
-    majors = ["25%", "50%", "90%", "99%", "99.9%", "99.99%", "99.999%", "99.9999%"]
+    plt.xticks(all_percentiles[0:percentiles_max_index + 1])
+    plt.xlim([0, max_percentile])
+    majors = all_percentile_labels[0:percentiles_max_index + 1]
     ax.xaxis.set_major_formatter(ticker.FixedFormatter(majors))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102),
-               loc=3, ncol=2,  borderaxespad=0.,
+    plt.legend(bbox_to_anchor=(0.017, .02, 1., .1),
+               loc=3, ncol=2, borderaxespad=0.0,
                labels=labels)
 
     return fig, ax
@@ -89,10 +124,12 @@ def arg_parse():
     parser.add_argument('files', nargs='+', help='list HDR files to plot')
     parser.add_argument('--output', default='latency.png',
                         help='Output file name (default: latency.png)')
-    parser.add_argument('--title', default='', help='The plot title.')
-    parser.add_argument("--nobox", help="Do not plot summary box",
+    parser.add_argument('--title', default='', help='The plot title')
+    parser.add_argument("--nobox", help="Do not plot the summary box",
                         action="store_true")
-    args = parser.parse_args()
+    parser.add_argument('--units', default='us', help='The latency units (ns, us, ms)')
+    parser.add_argument('--percentiles-range-max', default='99.9999', help='The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)')
+    args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     return args
 
 
@@ -100,19 +137,31 @@ def main():
     # print command line arguments
     args = arg_parse()
 
+    supported_units = {
+        "ns": "nanoseconds",
+        "us": "microseconds",
+        "ms": "milliseconds"
+    }
+
+    units = {
+        "name": supported_units[args.units],
+        "shorthand": args.units
+    }
+
     # load the data and create the plot
-    pct_data = parse_files(args.files)
+    pct_data = parse_pct_files(args.files)
+    metadata = parse_metadata_files(args.files)
     labels = [re.findall(filename, file)[0][1] for file in args.files]
     # plotting data
-    fig, ax = plot_percentiles(pct_data, labels)
+    fig, ax = plot_percentiles(pct_data, labels, units, args.percentiles_range_max)
     # plotting summary box
     if not args.nobox:
-        plot_summarybox(ax, pct_data, labels)
+        plot_summarybox(ax, pct_data, metadata, labels, units)
     # add title
     plt.suptitle(args.title)
     # save image
     plt.savefig(args.output)
-    print( "Wrote: " + args.output)
+    print("Wrote: " + args.output)
 
 
 # for testing
