@@ -58,7 +58,7 @@ def info_text(name, data, metadata, units):
     unit = units['shorthand']
     min = data['Latency'].min()
     mean = float(metadata['Mean'])
-    median = float(data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency'])
+    median = float((data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency']).iloc[0])
     max = data['Latency'].max()
     textstr = f'{name}\n{delimiter}\n' \
               f'min    = {min:>9.2f} {unit}\n' \
