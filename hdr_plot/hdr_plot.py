@@ -53,18 +53,36 @@ def parse_pct_files( files ):
 def parse_metadata_files( files ):
     return [ parse_metadata(file) for file in files ]
 
-def info_text(name, data, metadata, units):
+def info_text(name, data, metadata, units, summary_fields):
     delimiter = '---------------------'
     unit = units['shorthand']
     min = data['Latency'].min()
     mean = float(metadata['Mean'])
     median = float((data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency']).iloc[0])
     max = data['Latency'].max()
-    textstr = f'{name}\n{delimiter}\n' \
-              f'min    = {min:>9.2f} {unit}\n' \
-              f'mean   = {mean:>9.2f} {unit}\n' \
-              f'median = {median:>9.2f} {unit}\n' \
-              f'max    = {max:>9.2f} {unit}\n'
+    p99 = (data.loc[data['Percentile'] >= 0.99]['Latency']).iloc[0]
+    p9999_df = (data.loc[data['Percentile'] >= 0.9999]['Latency'])
+    p9999 = 0.0
+    if not p9999_df.empty:
+        p9999 = p9999_df.iloc[0]
+    p999999_df = (data.loc[data['Percentile'] >= 0.999999]['Latency'])
+    p999999 = 0.0
+    if not p999999_df.empty:
+        p999999 = p999999_df.iloc[0]
+    info_values = {
+        'min': min,
+        'mean': mean,
+        'median': median,
+        'max': max,
+        'p99': p99,
+        'p9999': p9999,
+        'p999999': p999999
+    }
+
+    textstr = f'{name}\n{delimiter}\n'
+    for f in summary_fields:
+        padding = 9 - len(f)
+        textstr += f'{f}{" "*padding}= {info_values[f]:>7.2f} {unit}\n'
     return textstr
 
 def info_box(ax, text, x):
@@ -75,14 +93,14 @@ def info_box(ax, text, x):
             verticalalignment='top', bbox=props, fontname='monospace')
 
 
-def plot_summarybox( ax, percentiles, metadata, labels, units ):
+def plot_summarybox( ax, percentiles, metadata, labels, units, summary_fields):
     # add info box to the side
     if len(labels) < 5:
-        textstr = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units) for i in range(len(labels))])
+        textstr = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(len(labels))])
         info_box(ax, textstr, 0.02)
     else:
-        textstr1 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units) for i in range(4)])
-        textstr2 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units) for i in range(4, len(labels))])
+        textstr1 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(4)])
+        textstr2 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(4, len(labels))])
         info_box(ax, textstr1, 0.02)
         info_box(ax, textstr2, 0.18)
 
@@ -129,6 +147,7 @@ def arg_parse():
                         action="store_true")
     parser.add_argument('--units', default='us', help='The latency units (ns, us, ms)')
     parser.add_argument('--percentiles-range-max', default='99.9999', help='The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)')
+    parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='The fields to show in the summary box. Can be: min, max, mean, median, p99, p9999, p999999')
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     return args
 
@@ -156,7 +175,7 @@ def main():
     fig, ax = plot_percentiles(pct_data, labels, units, args.percentiles_range_max)
     # plotting summary box
     if not args.nobox:
-        plot_summarybox(ax, pct_data, metadata, labels, units)
+        plot_summarybox(ax, pct_data, metadata, labels, units, args.summary_fields.split(','))
     # add title
     plt.suptitle(args.title)
     # save image
