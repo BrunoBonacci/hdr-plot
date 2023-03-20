@@ -60,24 +60,36 @@ def info_text(name, data, metadata, units, summary_fields):
     mean = float(metadata['Mean'])
     median = float((data.iloc[(data['Percentile'] - 0.5).abs().argsort()[:1]]['Latency']).iloc[0])
     max = data['Latency'].max()
-    p99 = (data.loc[data['Percentile'] >= 0.99]['Latency']).iloc[0]
-    p9999_df = (data.loc[data['Percentile'] >= 0.9999]['Latency'])
-    p9999 = 0.0
-    if not p9999_df.empty:
-        p9999 = p9999_df.iloc[0]
-    p999999_df = (data.loc[data['Percentile'] >= 0.999999]['Latency'])
-    p999999 = 0.0
-    if not p999999_df.empty:
-        p999999 = p999999_df.iloc[0]
+
+    def get_percentile_latency(percentile):
+        df = (data.loc[data['Percentile'] >= percentile]['Latency'])
+        if not df.empty:
+            return df.iloc[0]
+        else:
+            return 0.0
+
+    percentiles = {
+        'p50': 0.50,
+        'p90': 0.90,
+        'p99': 0.99,
+        'p999': 0.999,
+        'p9999': 0.9999,
+        'p99999': 0.99999,
+        'p999999': 0.999999,
+        'p9999999': 0.9999999,
+        'p99999999': 0.99999999,
+        'p999999999': 0.999999999
+    }
+
     info_values = {
         'min': min,
         'mean': mean,
         'median': median,
-        'max': max,
-        'p99': p99,
-        'p9999': p9999,
-        'p999999': p999999
+        'max': max
     }
+
+    for k, v in percentiles.items():
+        info_values[k] = get_percentile_latency(v)
 
     textstr = f'{name}\n{delimiter}\n'
     for f in summary_fields:
@@ -147,7 +159,7 @@ def arg_parse():
                         action="store_true")
     parser.add_argument('--units', default='us', help='The latency units (ns, us, ms)')
     parser.add_argument('--percentiles-range-max', default='99.9999', help='The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)')
-    parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='The fields to show in the summary box. Can be: min, max, mean, median, p99, p9999, p999999')
+    parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='The fields to show in the summary box. Can be: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999999')
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     return args
 
