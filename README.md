@@ -24,18 +24,18 @@ usage: hdr-plot [-h] [--output OUTPUT] [--title TITLE] [--nobox] [--units UNITS]
 Plot HDRHistogram latencies.
 
 positional arguments:
-files                 list HDR files to plot
+  files                 list HDR files to plot
 
 options:
--h, --help            show this help message and exit
---output OUTPUT       Output file name (default: latency.png)
---title TITLE         The plot title
---nobox               Do not plot the summary box
---units UNITS         The latency units (ns, us, ms)
---percentiles-range-max PERCENTILES_RANGE_MAX
-The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)
---summary-fields SUMMARY_FIELDS
-The fields to show in the summary box. Can be: min, max, mean, median, p99, p9999, p999999
+  -h, --help            show this help message and exit
+  --output OUTPUT       Output file name (default: latency.png)
+  --title TITLE         The plot title
+  --nobox               Do not plot the summary box
+  --units UNITS         The latency units (ns, us, ms)
+  --percentiles-range-max PERCENTILES_RANGE_MAX
+                        The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)
+  --summary-fields SUMMARY_FIELDS
+                        The fields to show in the summary box. Can be: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999999
 ```
 
 Then run `wrk` with the `-L` option and store the output into a file, like:
