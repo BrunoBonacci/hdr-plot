@@ -118,7 +118,11 @@ def plot_summarybox( ax, percentiles, metadata, labels, units, summary_fields):
 
 
 def plot_percentiles(percentiles, labels, units, percentiles_range_max):
-    fig, ax = plt.subplots(figsize=(16,8))
+    fig, ax = plt.subplots(figsize=(16, 8))
+    plt.rc('font', size=8)
+    plt.rc('figure', titlesize=12)
+    plt.rc('axes', titlesize=10)
+
     max_percentile = float("0." + percentiles_range_max.replace('.', ''))
 
     # plot values
