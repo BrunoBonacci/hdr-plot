@@ -2,7 +2,7 @@
 # hdr-plot.py v0.2.3 - A simple HdrHistogram plotting script.
 # Copyright © 2018 Bruno Bonacci - Distributed under the Apache License v 2.0
 #
-# usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] [--nobox] files [files ...]
+# usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] [--nosummary] files [files ...]
 #
 # A standalone plotting script for https://github.com/giltene/wrk2 and
 #  https://github.com/HdrHistogram/HdrHistogram.
@@ -155,15 +155,15 @@ def plot_percentiles(percentiles, labels, units, percentiles_range_max):
 
 def arg_parse():
     parser = argparse.ArgumentParser(description='Plot HDRHistogram latencies.')
-    parser.add_argument('files', nargs='+', help='list HDR files to plot')
+    parser.add_argument('files', nargs='+', help='List HDR files to plot')
     parser.add_argument('--output', default='latency.png',
                         help='Output file name (default: latency.png)')
     parser.add_argument('--title', default='', help='The plot title')
-    parser.add_argument("--nobox", help="Do not plot the summary box",
+    parser.add_argument("--nosummary", help='Do not plot the summary box',
                         action="store_true")
-    parser.add_argument('--units', default='us', help='The latency units (ns, us, ms)')
+    parser.add_argument('--units', default='ms', help='The latency units (ns, us, ms)')
     parser.add_argument('--percentiles-range-max', default='99.9999', help='The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)')
-    parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='The fields to show in the summary box. Can be: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999999')
+    parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='List of fields to show in the summary box. A comma-separated list of: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999. Default: median,p999,p9999,max')
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     return args
 
@@ -190,7 +190,7 @@ def main():
     # plotting data
     fig, ax = plot_percentiles(pct_data, labels, units, args.percentiles_range_max)
     # plotting summary box
-    if not args.nobox:
+    if not args.nosummary:
         plot_summarybox(ax, pct_data, metadata, labels, units, args.summary_fields.split(','))
     # add title
     plt.suptitle(args.title)
