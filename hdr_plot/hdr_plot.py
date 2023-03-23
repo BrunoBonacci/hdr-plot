@@ -2,7 +2,7 @@
 # hdr-plot.py v0.2.3 - A simple HdrHistogram plotting script.
 # Copyright © 2018 Bruno Bonacci - Distributed under the Apache License v 2.0
 #
-# usage: hdr-plot.py [-h] [--output OUTPUT] [--title TITLE] [--nosummary] files [files ...]
+# usage: hdr-plot [-h] [--output OUTPUT] [--title TITLE] [--nosummary] [--noversion] [--units UNITS] [--percentiles-range-max PERCENTILES_RANGE_MAX] [--summary-fields SUMMARY_FIELDS] files [files ...]
 #
 # A standalone plotting script for https://github.com/giltene/wrk2 and
 #  https://github.com/HdrHistogram/HdrHistogram.
@@ -17,7 +17,7 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-
+import pkg_resources
 
 #
 # parsing and plotting functions
@@ -169,9 +169,12 @@ def arg_parse():
     parser.add_argument('--title', default='', help='The plot title')
     parser.add_argument("--nosummary", help='Do not plot the summary box',
                         action="store_true")
+    parser.add_argument("--noversion", help='Does not plot the version of hdr-plot',
+                        action="store_true")
     parser.add_argument('--units', default='ms', help='The latency units (ns, us, ms)')
     parser.add_argument('--percentiles-range-max', default='99.9999', help='The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)')
     parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='List of fields to show in the summary box. A comma-separated list of: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999. Default: median,p999,p9999,max')
+
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     return args
 
@@ -202,6 +205,10 @@ def main():
         plot_summarybox(fig, ax, pct_data, metadata, labels, units, args.summary_fields.split(','))
     # add title
     plt.suptitle(args.title)
+    if not args.noversion:
+        # add version
+        version = pkg_resources.require("hdr-plot")[0].version
+        fig.text(0.812, 0.035, f'plotted by hdr-plot v{version}', horizontalalignment='left')
     # save image
     plt.savefig(args.output)
     print("Wrote: " + args.output)
