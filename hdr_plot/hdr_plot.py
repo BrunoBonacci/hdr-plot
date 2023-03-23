@@ -101,11 +101,13 @@ def info_box(ax, text, x):
     props = dict(boxstyle='round', facecolor='lightcyan', alpha=0.5)
 
     # place a text box in upper left in axes coords
-    ax.text(x, 0.95, text, transform=ax.transAxes,
+    t = ax.text(x, 0.95, text, transform=ax.transAxes,
             verticalalignment='top', bbox=props, fontname='monospace')
 
+    return t
 
-def plot_summarybox( ax, percentiles, metadata, labels, units, summary_fields):
+
+def plot_summarybox(fig, ax, percentiles, metadata, labels, units, summary_fields):
     # add info box to the side
     if len(labels) < 5:
         textstr = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(len(labels))])
@@ -113,8 +115,14 @@ def plot_summarybox( ax, percentiles, metadata, labels, units, summary_fields):
     else:
         textstr1 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(4)])
         textstr2 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(4, len(labels))])
-        info_box(ax, textstr1, 0.02)
-        info_box(ax, textstr2, 0.18)
+
+        box1 = info_box(ax, textstr1, 0.01)
+
+        # align the second box next to the first one by retrieving its width
+        box1_dimensions = box1.get_window_extent(renderer=fig.canvas.get_renderer())
+        box1_edge = box1_dimensions.x1, 0
+        box2_edge_axes_coords = ax.transAxes.inverted().transform(box1_edge)
+        info_box(ax, textstr2, box2_edge_axes_coords[0] + 0.01)
 
 
 def plot_percentiles(percentiles, labels, units, percentiles_range_max):
@@ -191,7 +199,7 @@ def main():
     fig, ax = plot_percentiles(pct_data, labels, units, args.percentiles_range_max)
     # plotting summary box
     if not args.nosummary:
-        plot_summarybox(ax, pct_data, metadata, labels, units, args.summary_fields.split(','))
+        plot_summarybox(fig, ax, pct_data, metadata, labels, units, args.summary_fields.split(','))
     # add title
     plt.suptitle(args.title)
     # save image
