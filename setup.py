@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="hdr-plot",
-    version="0.2.3",
+    version="0.6.0",
     author="Bruno Bonacci",
     author_email="bonacci.bruno@gmail.com",
     description="A simple HdrHistogram plotting script.",

@@ -61,6 +61,10 @@ You can provide more files to be plotted on the same graph:
 
 Please note that the name of the file is used as label for the plot legend.
 
+## Acknowledgements
+
+A special thank to [@Manuelbernhardt](https://github.com/manuelbernhardt)for providing PRs for a lot of improvements!
+
 ## License
 
-Copyright © 2018 Bruno Bonacci - Distributed under the [Apache License v 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+Copyright © 2018-2023 Bruno Bonacci - Distributed under the [Apache License v 2.0](http://www.apache.org/licenses/LICENSE-2.0)

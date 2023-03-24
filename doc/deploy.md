@@ -3,7 +3,7 @@
 ``` bash
 pip install wheel
 pip install twine
-rm -fr dist/ hdr_plot.egg-info/ build/
+rm -fr dist/ hdr_plot.egg-info/ build/ .eggs/
 
 # TEST BUILD
 
