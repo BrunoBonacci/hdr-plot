@@ -173,7 +173,7 @@ def arg_parse():
                         action="store_true")
     parser.add_argument('--units', default='ms', help='The latency units (ns, us, ms)')
     parser.add_argument('--percentiles-range-max', default='99.9999', help='The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)')
-    parser.add_argument('--summary-fields', default='median,p99,p9999,max', help='List of fields to show in the summary box. A comma-separated list of: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999. Default: median,p999,p9999,max')
+    parser.add_argument('--summary-fields', default='median,p999,p9999,max', help='List of fields to show in the summary box. A comma-separated list of: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999. Default: median,p999,p9999,max')
 
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     return args
