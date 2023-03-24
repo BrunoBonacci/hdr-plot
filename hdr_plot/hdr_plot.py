@@ -208,7 +208,7 @@ def main():
     if not args.noversion:
         # add version
         version = pkg_resources.require("hdr-plot")[0].version
-        fig.text(0.812, 0.035, f'plotted by hdr-plot v{version}', horizontalalignment='left')
+        fig.text(0.812, 0.035, f'plotted by hdr-plot v{version}', horizontalalignment='left', color='grey')
     # save image
     plt.savefig(args.output)
     print("Wrote: " + args.output)

@@ -19,15 +19,18 @@ installation:
 usage:
 
 ```
-usage: hdr-plot [-h] [--output OUTPUT] [--title TITLE] [--nosummary] [--noversion] [--units UNITS] [--percentiles-range-max PERCENTILES_RANGE_MAX] [--summary-fields SUMMARY_FIELDS]
-                files [files ...]
+usage: hdr_plot.py [-h] [--output OUTPUT] [--title TITLE] [--nosummary]
+                   [--noversion] [--units UNITS]
+                   [--percentiles-range-max PERCENTILES_RANGE_MAX]
+                   [--summary-fields SUMMARY_FIELDS]
+                   files [files ...]
 
 Plot HDRHistogram latencies.
 
 positional arguments:
   files                 List HDR files to plot
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   --output OUTPUT       Output file name (default: latency.png)
   --title TITLE         The plot title
@@ -35,9 +38,12 @@ options:
   --noversion           Does not plot the version of hdr-plot
   --units UNITS         The latency units (ns, us, ms)
   --percentiles-range-max PERCENTILES_RANGE_MAX
-                        The maximum value of the percentiles range, e.g. 99.9999 (i.e. how many nines to display)
+                        The maximum value of the percentiles range, e.g.
+                        99.9999 (i.e. how many nines to display)
   --summary-fields SUMMARY_FIELDS
-                        List of fields to show in the summary box. A comma-separated list of: min, max, mean, median, p50, p90, p99, p999, p9999, ..., p999999. Default:
+                        List of fields to show in the summary box. A comma-
+                        separated list of: min, max, mean, median, p50, p90,
+                        p99, p999, p9999, ..., p999999. Default:
                         median,p999,p9999,max
 ```
 
@@ -53,6 +59,7 @@ You can provide more files to be plotted on the same graph:
 
     hdr-plot --output myplot.png --title "My plot" ./sample/file1.out ./sample/file2.out ./sample/file3.out
 
+Please note that the name of the file is used as label for the plot legend.
 
 ## License
 
