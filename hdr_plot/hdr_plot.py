@@ -124,7 +124,7 @@ def plot_summarybox(fig, ax, percentiles, metadata, labels, units, summary_field
             if previous_box is None:
                 previous_box = info_box(ax, textstr, 0.01)
             else:
-                # align the second box next to the first one by retrieving its width
+                # align the box next to the previous one
                 previous_box_dimensions = previous_box.get_window_extent(renderer=fig.canvas.get_renderer())
                 previous_box_edge = previous_box_dimensions.x1, 0
                 current_box_edge_axes_coords = ax.transAxes.inverted().transform(previous_box_edge)
@@ -160,7 +160,7 @@ def plot_percentiles(percentiles, labels, units, percentiles_range_max):
     majors = all_percentile_labels[0:percentiles_max_index + 1]
     ax.xaxis.set_major_formatter(ticker.FixedFormatter(majors))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
-    # we would like the labels not to be higher than 3
+    # we would like the labels box to have at most 3 lines
     n_col = math.ceil(len(labels) / 3)
     plt.legend(bbox_to_anchor=(0.125, 0.01, 1, 0.102), bbox_transform=fig.transFigure, loc=3, ncol=n_col,
                borderaxespad=0, labels=labels)
