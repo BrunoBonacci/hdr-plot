@@ -109,20 +109,25 @@ def info_box(ax, text, x):
 
 def plot_summarybox(fig, ax, percentiles, metadata, labels, units, summary_fields):
     # add info box to the side
-    if len(labels) < 5:
+    box_length = 5
+    if len(labels) <= box_length:
         textstr = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(len(labels))])
         info_box(ax, textstr, 0.02)
     else:
-        textstr1 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(4)])
-        textstr2 = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(4, len(labels))])
+        previous_box = None
+        for n in range(0, len(labels), box_length):
+            start = n
+            end = min(n + box_length, len(labels))
+            textstr = '\n'.join([info_text(labels[i], percentiles[i], metadata[i], units, summary_fields) for i in range(start, end)])
 
-        box1 = info_box(ax, textstr1, 0.01)
-
-        # align the second box next to the first one by retrieving its width
-        box1_dimensions = box1.get_window_extent(renderer=fig.canvas.get_renderer())
-        box1_edge = box1_dimensions.x1, 0
-        box2_edge_axes_coords = ax.transAxes.inverted().transform(box1_edge)
-        info_box(ax, textstr2, box2_edge_axes_coords[0] + 0.01)
+            if previous_box is None:
+                previous_box = info_box(ax, textstr, 0.01)
+            else:
+                # align the second box next to the first one by retrieving its width
+                previous_box_dimensions = previous_box.get_window_extent(renderer=fig.canvas.get_renderer())
+                previous_box_edge = previous_box_dimensions.x1, 0
+                current_box_edge_axes_coords = ax.transAxes.inverted().transform(previous_box_edge)
+                previous_box = info_box(ax, textstr, current_box_edge_axes_coords[0] + 0.01)
 
 
 def plot_percentiles(percentiles, labels, units, percentiles_range_max):
