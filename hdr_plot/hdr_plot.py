@@ -154,7 +154,7 @@ def plot_percentiles(percentiles, labels, units, percentiles_range_max):
     majors = all_percentile_labels[0:percentiles_max_index + 1]
     ax.xaxis.set_major_formatter(ticker.FixedFormatter(majors))
     ax.xaxis.set_minor_formatter(ticker.NullFormatter())
-    plt.legend(bbox_to_anchor=(0.125, 0.01, 1, 0.102), bbox_transform=fig.transFigure, loc=3, ncol=2,
+    plt.legend(bbox_to_anchor=(0.125, 0.01, 1, 0.102), bbox_transform=fig.transFigure, loc=3, ncol=3,
                borderaxespad=0, labels=labels)
     # make room for the legend
     plt.subplots_adjust(bottom=0.11)
