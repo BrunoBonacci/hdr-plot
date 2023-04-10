@@ -63,7 +63,7 @@ Please note that the name of the file is used as label for the plot legend.
 
 ## Acknowledgements
 
-A special thank to [@Manuelbernhardt](https://github.com/manuelbernhardt)for providing PRs for a lot of improvements!
+A special thank to [@Manuelbernhardt](https://github.com/manuelbernhardt) for providing PRs for a lot of improvements!
 
 ## License
 
