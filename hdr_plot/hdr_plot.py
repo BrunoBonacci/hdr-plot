@@ -67,7 +67,7 @@ def info_text(name, data, metadata, units, summary_fields):
         if not df.empty:
             return df.iloc[0]
         else:
-            return 0.0
+            return max
 
     percentiles = {
         'p50': 0.50,
